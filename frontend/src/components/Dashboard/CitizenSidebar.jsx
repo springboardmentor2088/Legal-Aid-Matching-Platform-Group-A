@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser, fetchUserProfile } from "../../Redux/authSlice.js";
+import appLogo from "../../assets/LOGO.png"; // adjust path if needed
 
 export default function CitizenSidebar({
   profile: propProfile,
@@ -13,31 +14,43 @@ export default function CitizenSidebar({
 }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   // Get profile data from Redux store
-  const { profile: reduxProfile, isAuthenticated } = useSelector((state) => state.auth);
-  
+  const { profile: reduxProfile, isAuthenticated } = useSelector(
+    (state) => state.auth
+  );
+
   // Fetch profile from backend on mount/refresh if not already loaded
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (token && isAuthenticated && (!reduxProfile.email && !reduxProfile.fullName)) {
+    if (
+      token &&
+      isAuthenticated &&
+      !reduxProfile.email &&
+      !reduxProfile.fullName
+    ) {
       // Only fetch if we have a token but no profile data
       dispatch(fetchUserProfile());
     }
   }, [dispatch, isAuthenticated, reduxProfile.email, reduxProfile.fullName]);
-  
+
   // Use Redux profile if available, otherwise fall back to prop
-  const profile = reduxProfile && (reduxProfile.email || reduxProfile.fullName) 
-    ? {
-        shortName: reduxProfile.shortName || reduxProfile.fullName || propProfile?.shortName || "",
-        fullName: reduxProfile.fullName || propProfile?.fullName || "",
-        photoUrl: reduxProfile.photoUrl || propProfile?.photoUrl || null,
-      }
-    : propProfile || {
-        shortName: "",
-        fullName: "",
-        photoUrl: null,
-      };
+  const profile =
+    reduxProfile && (reduxProfile.email || reduxProfile.fullName)
+      ? {
+          shortName:
+            reduxProfile.shortName ||
+            reduxProfile.fullName ||
+            propProfile?.shortName ||
+            "",
+          fullName: reduxProfile.fullName || propProfile?.fullName || "",
+          photoUrl: reduxProfile.photoUrl || propProfile?.photoUrl || null,
+        }
+      : propProfile || {
+          shortName: "",
+          fullName: "",
+          photoUrl: null,
+        };
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
@@ -68,40 +81,37 @@ export default function CitizenSidebar({
           : "translate-x-0"
       } bg-teal-900 text-white flex flex-col p-6`}
     >
-        {/* Close Button for Mobile */}
-        {isMobile && (
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-md hover:bg-teal-800 text-white"
-            aria-label="Close sidebar"
+      {/* Close Button for Mobile */}
+      {isMobile && (
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 rounded-md hover:bg-teal-800 text-white"
+          aria-label="Close sidebar"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        )}
-      <div className="flex items-center gap-3 pb-4 border-b border-teal-700">
-        <div className="w-12 h-12 bg-white/10 rounded-md flex items-center justify-center">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path
-              d="M3 7h18M3 12h18M3 17h18"
-              stroke="#fff"
-              strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
             />
           </svg>
+        </button>
+      )}
+      <div className="flex items-center gap-3 pb-4 border-b border-teal-700">
+        <div className="w-12 h-12 bg-white/10 rounded-md flex items-center justify-center">
+          <img
+            src={appLogo} // or "../assets/LOGO.png" based on your setup
+            alt="AdvoCare Logo"
+            className="w-8 h-8 object-contain"
+          />
         </div>
+
         <div>
           <div className="text-sm opacity-90">AdvoCare</div>
           <div className="text-xs opacity-80">Legal Aid Platform</div>
@@ -117,11 +127,17 @@ export default function CitizenSidebar({
               className="w-full h-full object-cover"
             />
           ) : (
-            <span>{profile.shortName?.charAt(0) || profile.fullName?.charAt(0) || "S"}</span>
+            <span>
+              {profile.shortName?.charAt(0) ||
+                profile.fullName?.charAt(0) ||
+                "S"}
+            </span>
           )}
         </div>
         <div>
-          <div className="font-semibold">{profile.shortName || profile.fullName || "User"}</div>
+          <div className="font-semibold">
+            {profile.shortName || profile.fullName || "User"}
+          </div>
           <div className="text-xs opacity-80">Citizen</div>
         </div>
       </div>
@@ -131,7 +147,7 @@ export default function CitizenSidebar({
           { key: "overview", label: "Overview" },
           { key: "addcase", label: "Add Your Case" },
           { key: "cases", label: "My Cases" },
-          { key: "find", label: "Find Lawyer" },
+          { key: "find", label: "Find Lawyer & NGOs" },
           { key: "messages", label: "Messages" },
           { key: "profile", label: "Profile" },
           { key: "settings", label: "Settings" },
@@ -159,4 +175,3 @@ export default function CitizenSidebar({
     </aside>
   );
 }
-

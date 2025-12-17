@@ -1,16 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, clearError } from "../../Redux/authSlice.js";
 import { toast } from "react-toastify";
+import logo from "../../assets/logo.png";
 
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const [showPassword, setShowPassword] = useState(false);
 
   // Get auth state from Redux
-  const { isLoading, error: authError, user, isAuthenticated } = useSelector((state) => state.auth);
+  const {
+    isLoading,
+    error: authError,
+    user,
+    isAuthenticated,
+  } = useSelector((state) => state.auth);
 
   const successMsg = location.state?.success || null;
 
@@ -22,14 +29,15 @@ export default function Login() {
 
   const [error, setError] = useState(null);
   const loading = isLoading;
-  
+
   // Validation state
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const toastShownRef = useRef(false);
 
   // Display success message (e.g., logout message) in toast
   useEffect(() => {
-    if (successMsg) {
+    if (successMsg && !toastShownRef.current) {
       toast.success(successMsg, {
         position: "top-right",
         autoClose: 3000,
@@ -38,7 +46,10 @@ export default function Login() {
         pauseOnHover: true,
         draggable: true,
       });
-      // Clear the location state to prevent showing the message again on re-render
+
+      toastShownRef.current = true;
+
+      // clear state so it doesn't show again
       window.history.replaceState({}, document.title);
     }
   }, [successMsg]);
@@ -65,7 +76,7 @@ export default function Login() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    
+
     // Validate on change if field has been touched
     if (touched[name]) {
       let error = "";
@@ -94,7 +105,7 @@ export default function Login() {
   useEffect(() => {
     if (isAuthenticated && user.role) {
       toast.success("Login successful!");
-      
+
       setTimeout(() => {
         const userRole = user.role;
         if (userRole === "CITIZEN") {
@@ -140,7 +151,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     e.stopPropagation(); // Prevent event bubbling
-    
+
     // Clear previous errors
     setError(null);
     setErrors({});
@@ -188,9 +199,9 @@ export default function Login() {
 
   return (
     <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-50 px-4">
-      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 min-h-[520px]">
         {/* IMAGE LEFT */}
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl h-96 md:h-[520px]">
+        <div className="relative rounded-2xl overflow-hidden shadow-2xl h-full">
           <img
             src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1400&q=60"
             alt="justice"
@@ -206,11 +217,19 @@ export default function Login() {
         </div>
 
         {/* LOGIN FORM */}
-        <div className="mx-auto w-full max-w-md">
-          <div className="bg-white/95 backdrop-blur-sm border border-gray-100 rounded-2xl shadow-xl p-8">
-            <h2 className="text-2xl font-extrabold text-gray-900">
-              Welcome Back
-            </h2>
+        <div className="w-full h-full flex flex-col">
+          <div className="bg-white/95 backdrop-blur-sm border border-gray-100 rounded-2xl shadow-xl p-8  w-full h-full flex flex-col justify-center">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-extrabold font-serif text-gray-900">
+                Welcome Back
+              </h2>
+
+              <img
+                src={logo} // or correct path to your logo
+                alt="App Logo"
+                className="h-15 w-auto"
+              />
+            </div>
 
             {error && (
               <div className="mb-4 text-sm text-red-600 rounded px-3 py-2 bg-red-50 border border-red-100">
@@ -218,12 +237,20 @@ export default function Login() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4" noValidate onKeyDown={(e) => {
-              // Prevent form submission on Enter key if there are errors
-              if (e.key === 'Enter' && (loading || Object.keys(errors).length > 0)) {
-                e.preventDefault();
-              }
-            }}>
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4"
+              noValidate
+              onKeyDown={(e) => {
+                // Prevent form submission on Enter key if there are errors
+                if (
+                  e.key === "Enter" &&
+                  (loading || Object.keys(errors).length > 0)
+                ) {
+                  e.preventDefault();
+                }
+              }}
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Registered Email <span className="text-red-500">*</span>
@@ -244,7 +271,9 @@ export default function Login() {
                   }`}
                 />
                 {touched.username && errors.username && (
-                  <span className="text-red-500 text-sm mt-1 block">{errors.username}</span>
+                  <span className="text-red-500 text-sm mt-1 block">
+                    {errors.username}
+                  </span>
                 )}
               </div>
 
@@ -252,23 +281,74 @@ export default function Login() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Password <span className="text-red-500">*</span>
                 </label>
-                <input
-                  name="password"
-                  type="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  onBlur={() => handleBlur("password")}
-                  disabled={loading}
-                  className={`w-full border rounded-lg p-3 focus:outline-none focus:ring-1 ${
-                    loading
-                      ? "bg-gray-100 cursor-not-allowed opacity-60 border-gray-200"
-                      : touched.password && errors.password
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                  }`}
-                />
+                <div className="relative">
+                  <input
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={form.password}
+                    onChange={handleChange}
+                    onBlur={() => handleBlur("password")}
+                    disabled={loading}
+                    className={`w-full border rounded-lg p-3 pr-10 focus:outline-none focus:ring-1 ${
+                      loading
+                        ? "bg-gray-100 cursor-not-allowed opacity-60 border-gray-200"
+                        : touched.password && errors.password
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                        : "border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                    }`}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      // eye-off
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10a9.99 9.99 0 012.93-7.07M3 3l18 18"
+                        />
+                      </svg>
+                    ) : (
+                      // eye
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+
                 {touched.password && errors.password && (
-                  <span className="text-red-500 text-sm mt-1 block">{errors.password}</span>
+                  <span className="text-red-500 text-sm mt-1 block">
+                    {errors.password}
+                  </span>
                 )}
               </div>
 
@@ -342,12 +422,11 @@ export default function Login() {
               </Link>
             </div>
           </div>
-
-          <p className="mt-6 text-center text-xs text-gray-500">
-            Need urgent help? Call our helpline:{" "}
-            <span className="font-medium">1800-000-000</span>
-          </p>
         </div>
+        {/* <p className="mt-6 text-center  width-100 text-xs text-gray-500">
+          Need urgent help? Call our helpline:{" "}
+          <span className="font-medium">1800-000-000</span>
+        </p> */}
       </div>
     </section>
   );

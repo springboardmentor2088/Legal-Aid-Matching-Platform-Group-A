@@ -3,6 +3,8 @@ import CitizenForm from "./CitizenForm";
 import LawyerForm from "./LawyerForm";
 import NGOForm from "./NGOForm";
 import { useNavigate } from "react-router-dom";
+import logo from "../../assets/logo.png";
+
 const Register = () => {
   // Initialize state with 'Citizen' as the default role
   const [role, setRole] = useState("Citizen");
@@ -12,6 +14,11 @@ const Register = () => {
   const handleRoleChange = (event) => {
     setRole(event.target.value);
   };
+
+  const handleLoginRedirect = () => {
+    navigate("/login");
+  };
+
   // Function to render the correct form component
   const renderForm = () => {
     switch (role) {
@@ -28,16 +35,24 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-4xl">
+      <div className="relative bg-white p-8 rounded-lg shadow-2xl w-full max-w-4xl">
+        {/* Logo */}
+        <img
+          src={logo}
+          alt="App Logo"
+          className="absolute top-4 right-4 h-25 w-auto object-contain opacity-90"
+        />
+
         {/* Header */}
         <header className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-700">
+          <h1 className="text-3xl font-bold font-serif text-blue-700">
             Account Registration
           </h1>
           <p className="text-gray-600 mt-2">
-            Join us as a <span className="font-semibold">**Citizen**</span>,
-            <span className="font-semibold"> **Lawyer**</span>, or
-            <span className="font-semibold"> **NGO**</span>.
+            Join us as a{" "}
+            <span className="font-semibold font-serif">Citizen</span>,{" "}
+            <span className="font-semibold font-serif">Lawyer</span> or{" "}
+            <span className="font-semibold font-serif">NGO</span>.
           </p>
         </header>
 
@@ -49,6 +64,7 @@ const Register = () => {
           >
             Select Role
           </label>
+
           <div className="relative">
             <select
               id="select-role"
@@ -61,6 +77,7 @@ const Register = () => {
               <option value="Lawyer">Lawyer</option>
               <option value="NGO">NGO</option>
             </select>
+
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
               <svg
                 className="h-5 w-5"
@@ -83,9 +100,13 @@ const Register = () => {
 
         <p className="text-center mt-6 text-sm text-gray-600">
           Already have an account?{" "}
-          <a href="#" className="text-blue-600 hover:underline font-medium">
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={handleLoginRedirect}
+            className="text-blue-600 hover:underline font-medium"
+          >
             Log In
-          </a>
+          </span>
         </p>
       </div>
     </div>

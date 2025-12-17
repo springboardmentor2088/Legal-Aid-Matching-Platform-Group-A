@@ -1,9 +1,13 @@
 import React from "react";
 
-export default function CitizenFindLawyer({ lawyers, setActivePage, setSelectedRecipient }) {
+export default function CitizenFindLawyer({
+  lawyers,
+  setActivePage,
+  setSelectedRecipient,
+}) {
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Find Lawyers</h2>
+      <h2 className="text-2xl font-bold mb-4">Find Lawyers and NGOs</h2>
       <div className="grid gap-4">
         {lawyers.map((L) => (
           <div
@@ -39,4 +43,3 @@ export default function CitizenFindLawyer({ lawyers, setActivePage, setSelectedR
     </div>
   );
 }
-

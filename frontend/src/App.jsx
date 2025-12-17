@@ -35,7 +35,7 @@ export default function App() {
         setUser(null);
         return;
       }
-      
+
       try {
         const res = await getProfile();
         if (res && res.data) {
@@ -88,13 +88,12 @@ export default function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/contact" element={<Contact />} />
         {/* Protected Routes */}
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
         {/* <Route element={<ProtectedRoute user={user} />}> */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/citizen/dashboard" element={<CitizenDashboard />} />
         <Route path="/lawyer/dashboard" element={<LawyerDashboard />} />
         <Route path="/ngo/dashboard" element={<NGODashboard />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/dashboard/admin" element={<AdminDashboard />} />{" "}
         {/* </Route> */}
         {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
       </Routes>

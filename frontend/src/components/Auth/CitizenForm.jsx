@@ -20,12 +20,12 @@ const CitizenForm = () => {
   // State to track validation errors
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  
+
   // State management for location dropdowns
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const scrollPositionRef = useRef(0);
-  
+
   // Get all states
   const stateOptions = INDIAN_STATES_AND_UT_ARRAY.map((state) => ({
     label: state,
@@ -40,12 +40,12 @@ const CitizenForm = () => {
   // Get districts based on selected state
   const districtOptions = useMemo(() => {
     if (!selectedState || !selectedStateObj) return [];
-    
+
     const stateKey = selectedStateObj.name;
     const districts = STATE_WISE_CITIES[stateKey];
-    
+
     if (!districts) return [];
-    
+
     // Extract unique districts from cities data
     const districtsSet = new Set();
     if (Array.isArray(districts)) {
@@ -56,7 +56,7 @@ const CitizenForm = () => {
           districtsSet.add(item.value);
         }
       });
-    } else if (typeof districts === 'object') {
+    } else if (typeof districts === "object") {
       Object.values(districts).forEach((cityList) => {
         if (Array.isArray(cityList)) {
           cityList.forEach((city) => {
@@ -70,11 +70,13 @@ const CitizenForm = () => {
         }
       });
     }
-    
-    return Array.from(districtsSet).sort().map((district) => ({
-      label: district,
-      value: district,
-    }));
+
+    return Array.from(districtsSet)
+      .sort()
+      .map((district) => ({
+        label: district,
+        value: district,
+      }));
   }, [selectedState, selectedStateObj]);
 
   // Sync Redux state with local dropdown state
@@ -95,7 +97,7 @@ const CitizenForm = () => {
     dispatch(updateCitizen({ field: "state", value: state }));
     dispatch(updateCitizen({ field: "district", value: "" }));
     dispatch(updateCitizen({ field: "city", value: "" }));
-    
+
     setTimeout(() => {
       window.scrollTo({
         top: scrollPositionRef.current,
@@ -110,7 +112,7 @@ const CitizenForm = () => {
     setSelectedDistrict(district);
     dispatch(updateCitizen({ field: "district", value: district }));
     dispatch(updateCitizen({ field: "city", value: "" }));
-    
+
     setTimeout(() => {
       window.scrollTo({
         top: scrollPositionRef.current,
@@ -185,7 +187,10 @@ const CitizenForm = () => {
       return "Password is required";
     }
     if (password.length < 8) {
-      return "Password must be at least 8 characters";
+      return "Password must be at least 8 characters ";
+    }
+    if (password.length > 21) {
+      return "Password must be at most 21 characters";
     }
     if (!/(?=.*[a-z])/.test(password)) {
       return "Password must contain at least one lowercase letter";
@@ -337,9 +342,7 @@ const CitizenForm = () => {
     });
 
     setErrors(newErrors);
-    setTouched(
-      fields.reduce((acc, field) => ({ ...acc, [field]: true }), {})
-    );
+    setTouched(fields.reduce((acc, field) => ({ ...acc, [field]: true }), {}));
 
     return Object.keys(newErrors).length === 0;
   };
@@ -365,7 +368,7 @@ const CitizenForm = () => {
         result.payload?.data?.message ||
         "Registration successful! Redirecting to login...";
       toast.success(successMessage);
-      
+
       // Navigate after a short delay to show the success message
       setTimeout(() => {
         navigate("/login");
@@ -547,8 +550,6 @@ const CitizenForm = () => {
           )}
         </div>
 
-       
-
         {/* State */}
         <div className="flex flex-col">
           <label
@@ -690,6 +691,7 @@ const CitizenForm = () => {
             value={citizen.password || ""}
             onChange={(e) => handleChange("password", e.target.value)}
             onBlur={() => handleBlur("password")}
+            maxLength={20}
             disabled={isLoading}
             className={`border p-2 rounded ${
               isLoading
@@ -720,6 +722,7 @@ const CitizenForm = () => {
             onChange={(e) => handleChange("confirmPassword", e.target.value)}
             onBlur={() => handleBlur("confirmPassword")}
             disabled={isLoading}
+            maxLength={20}
             className={`border p-2 rounded ${
               isLoading
                 ? "bg-gray-100 cursor-not-allowed opacity-60"

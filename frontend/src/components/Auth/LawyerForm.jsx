@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateLawyer, submitRegistration } from "../../Redux/registerSlice";
@@ -10,8 +16,24 @@ import {
 } from "indian-states-cities-list";
 
 // Reusable input component - moved outside to prevent recreation on each render
-const InputField = ({ label, id, type = "text", placeholder, field, value, onChange, onBlur, disabled = false, lawyer, isLoading, handleChange, error, touched, required = false }) => {
-  const fieldValue = value !== undefined ? value : (lawyer?.[field] || "");
+const InputField = ({
+  label,
+  id,
+  type = "text",
+  placeholder,
+  field,
+  value,
+  onChange,
+  onBlur,
+  disabled = false,
+  lawyer,
+  isLoading,
+  handleChange,
+  error,
+  touched,
+  required = false,
+}) => {
+  const fieldValue = value !== undefined ? value : lawyer?.[field] || "";
   const handleInputChange = (e) => {
     if (onChange) {
       onChange(e);
@@ -19,9 +41,9 @@ const InputField = ({ label, id, type = "text", placeholder, field, value, onCha
       handleChange(field, e.target.value);
     }
   };
-  
+
   const showError = touched && error;
-  
+
   return (
     <div className="flex flex-col">
       <label htmlFor={id} className="text-sm font-medium text-gray-700 mb-1">
@@ -43,9 +65,7 @@ const InputField = ({ label, id, type = "text", placeholder, field, value, onCha
             : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
         }`}
       />
-      {showError && (
-        <span className="text-red-500 text-sm mt-1">{error}</span>
-      )}
+      {showError && <span className="text-red-500 text-sm mt-1">{error}</span>}
     </div>
   );
 };
@@ -54,32 +74,32 @@ const LawyerForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const scrollPositionRef = useRef(0);
-  
+
   // Store files in refs instead of Redux (files are not serializable)
   const aadharProofFileRef = useRef(null);
   const barCertFileRef = useRef(null);
-  
+
   // Get lawyer data from Redux store
   const lawyer = useSelector((state) => state.register.lawyer);
   const isLoading = useSelector((state) => state.register.loading);
-  
+
   // Validation state
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  
+
   // State management for location dropdowns
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedBarState, setSelectedBarState] = useState("");
   const [selectedSpecialization, setSelectedSpecialization] = useState("");
-  
+
   // State management for latitude and longitude
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [locationError, setLocationError] = useState("");
-  
+
   // State management for address
   const [address, setAddress] = useState("");
   const [isGeocoding, setIsGeocoding] = useState(false);
@@ -99,12 +119,12 @@ const LawyerForm = () => {
   // Get districts based on selected state
   const districtOptions = useMemo(() => {
     if (!selectedState || !selectedStateObj) return [];
-    
+
     const stateKey = selectedStateObj.name;
     const districts = STATE_WISE_CITIES[stateKey];
-    
+
     if (!districts) return [];
-    
+
     // Convert array of district objects to options
     return Array.isArray(districts)
       ? districts.map((district) => ({
@@ -131,11 +151,11 @@ const LawyerForm = () => {
   const handleStateChange = (state) => {
     // Save current scroll position
     scrollPositionRef.current = window.scrollY;
-    
+
     setSelectedState(state);
     setSelectedDistrict(""); // Reset district when state changes
     setSelectedCity(""); // Reset city when state changes
-    
+
     // Restore scroll position after state update
     setTimeout(() => {
       window.scrollTo({
@@ -149,10 +169,10 @@ const LawyerForm = () => {
   const handleDistrictChange = (district) => {
     // Save current scroll position
     scrollPositionRef.current = window.scrollY;
-    
+
     setSelectedDistrict(district);
     setSelectedCity(""); // Reset city when district changes
-    
+
     // Restore scroll position after district update
     setTimeout(() => {
       window.scrollTo({
@@ -198,29 +218,39 @@ const LawyerForm = () => {
       },
       (error) => {
         setIsGettingLocation(false);
-        
+
         // Retry once with lower accuracy settings if timeout occurs
         if (error.code === error.TIMEOUT && retryCount === 0) {
-          console.log("First attempt timed out, retrying with lower accuracy...");
+          console.log(
+            "First attempt timed out, retrying with lower accuracy..."
+          );
           setTimeout(() => {
             handleGetCurrentLocation(1);
           }, 500);
           return;
         }
-        
+
         // Handle errors
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            setLocationError("Location access denied. Please enable location permissions in your browser settings.");
+            setLocationError(
+              "Location access denied. Please enable location permissions in your browser settings."
+            );
             break;
           case error.POSITION_UNAVAILABLE:
-            setLocationError("Location information unavailable. Please try entering coordinates manually or use the address geocoding feature.");
+            setLocationError(
+              "Location information unavailable. Please try entering coordinates manually or use the address geocoding feature."
+            );
             break;
           case error.TIMEOUT:
-            setLocationError("Location request timed out. Please check your GPS/WiFi connection or enter coordinates manually.");
+            setLocationError(
+              "Location request timed out. Please check your GPS/WiFi connection or enter coordinates manually."
+            );
             break;
           default:
-            setLocationError("Unable to get location. Please enter coordinates manually or use the address geocoding feature.");
+            setLocationError(
+              "Unable to get location. Please enter coordinates manually or use the address geocoding feature."
+            );
             break;
         }
       },
@@ -274,13 +304,24 @@ const LawyerForm = () => {
   };
 
   const validateBarCouncilId = (barId) => {
-    if (!barId || barId.trim() === "") {
-      return "Bar Council ID is required";
+    if (!value) {
+      return "Enrollment number is required.";
     }
-    if (barId.trim().length < 3) {
-      return "Bar Council ID must be at least 3 characters";
+
+    const enrollmentRegex = /^[A-Z]{2,3}\/\d{1,5}\/(19|20)\d{2}$/;
+
+    if (!enrollmentRegex.test(value)) {
+      return "Invalid enrollment number format. Example: MAH/1234/2012";
     }
-    return "";
+
+    const year = parseInt(value.split("/")[2], 10);
+    const currentYear = new Date().getFullYear();
+
+    if (year > currentYear) {
+      return "Enrollment year cannot be in the future.";
+    }
+
+    return ""; // ✅ VALID
   };
 
   const validateBarState = (barState) => {
@@ -486,7 +527,7 @@ const LawyerForm = () => {
   // Handle field blur - validate on blur
   const handleBlur = (field) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
-    
+
     // Handle latitude and longitude from local state
     if (field === "latitude") {
       const value = latitude || lawyer.latitude || "";
@@ -513,7 +554,7 @@ const LawyerForm = () => {
     // Build full address with state, district, city if available
     // Format: Address, City, District, State, India
     let addressParts = [];
-    
+
     if (address.trim()) {
       addressParts.push(address.trim());
     }
@@ -527,7 +568,7 @@ const LawyerForm = () => {
       addressParts.push(selectedState);
     }
     addressParts.push("India");
-    
+
     const fullAddress = addressParts.join(", ");
 
     setIsGeocoding(true);
@@ -537,11 +578,13 @@ const LawyerForm = () => {
     try {
       // Using backend endpoint to avoid CORS issues
       const response = await fetch(
-        `http://localhost:8080/api/geocoding/geocode?address=${encodeURIComponent(fullAddress)}`,
+        `http://localhost:8080/api/geocoding/geocode?address=${encodeURIComponent(
+          fullAddress
+        )}`,
         {
           method: "GET",
           headers: {
-            "Accept": "application/json",
+            Accept: "application/json",
           },
         }
       );
@@ -549,19 +592,22 @@ const LawyerForm = () => {
       // Get response text first to handle both JSON and text responses
       const responseText = await response.text();
       let data;
-      
+
       try {
         // Try to parse as JSON
         data = JSON.parse(responseText);
       } catch (e) {
         // If not JSON, it's a plain text error
-        setGeocodingError(responseText || `Geocoding request failed: ${response.status}`);
+        setGeocodingError(
+          responseText || `Geocoding request failed: ${response.status}`
+        );
         return;
       }
 
       if (!response.ok) {
         // Handle error response (which should be JSON now)
-        const errorMessage = data?.error || data?.message || "Address not found";
+        const errorMessage =
+          data?.error || data?.message || "Address not found";
         setGeocodingError(errorMessage);
         return;
       }
@@ -575,45 +621,65 @@ const LawyerForm = () => {
       } else if (data && data.error) {
         setGeocodingError(data.error);
       } else {
-        setGeocodingError("Address not found. Please try a more specific address or enter coordinates manually.");
+        setGeocodingError(
+          "Address not found. Please try a more specific address or enter coordinates manually."
+        );
       }
     } catch (error) {
       console.error("Geocoding error:", error);
-      setGeocodingError("Failed to geocode address. Please try again or enter coordinates manually.");
+      setGeocodingError(
+        "Failed to geocode address. Please try again or enter coordinates manually."
+      );
     } finally {
       setIsGeocoding(false);
     }
   };
   // Update Redux state when form fields change - memoized to prevent re-renders
-  const handleChange = useCallback((field, value) => {
-    dispatch(updateLawyer({ field, value }));
-    
-    // Validate on change if field has been touched
-    if (touched[field]) {
-      const error = validateField(field, value);
-      setErrors((prev) => ({ ...prev, [field]: error }));
-    }
-  }, [dispatch, touched]);
+  const handleChange = useCallback(
+    (field, value) => {
+      dispatch(updateLawyer({ field, value }));
+
+      // Validate on change if field has been touched
+      if (touched[field]) {
+        const error = validateField(field, value);
+        setErrors((prev) => ({ ...prev, [field]: error }));
+      }
+    },
+    [dispatch, touched]
+  );
 
   // Handle file uploads - store files in refs, only store filename in Redux
-  const handleFileChange = useCallback((field, file) => {
-    // Validate file type - only PDF allowed
-    if (file && file.type !== "application/pdf") {
-      toast.error("Only PDF files are allowed. Please select a PDF file.");
-      return;
-    }
-    
-    // Store file in ref
-    if (field === "aadharProof") {
-      aadharProofFileRef.current = file;
-      // Only store filename in Redux (serializable)
-      dispatch(updateLawyer({ field: "aadharProofFilename", value: file ? file.name : "" }));
-    } else if (field === "barCert") {
-      barCertFileRef.current = file;
-      // Only store filename in Redux (serializable)
-      dispatch(updateLawyer({ field: "barCertFilename", value: file ? file.name : "" }));
-    }
-  }, [dispatch]);
+  const handleFileChange = useCallback(
+    (field, file) => {
+      // Validate file type - only PDF allowed
+      if (file && file.type !== "application/pdf") {
+        toast.error("Only PDF files are allowed. Please select a PDF file.");
+        return;
+      }
+
+      // Store file in ref
+      if (field === "aadharProof") {
+        aadharProofFileRef.current = file;
+        // Only store filename in Redux (serializable)
+        dispatch(
+          updateLawyer({
+            field: "aadharProofFilename",
+            value: file ? file.name : "",
+          })
+        );
+      } else if (field === "barCert") {
+        barCertFileRef.current = file;
+        // Only store filename in Redux (serializable)
+        dispatch(
+          updateLawyer({
+            field: "barCertFilename",
+            value: file ? file.name : "",
+          })
+        );
+      }
+    },
+    [dispatch]
+  );
 
   // Validate all fields before submission
   const validateAll = () => {
@@ -683,7 +749,7 @@ const LawyerForm = () => {
   // 3. Create the submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate all fields before submission
     if (!validateAll()) {
       toast.error("Please fix all validation errors before submitting");
@@ -698,7 +764,7 @@ const LawyerForm = () => {
       }
       return;
     }
-    
+
     // Prepare form data with all fields including latitude and longitude
     const formData = {
       ...lawyer,
@@ -708,7 +774,7 @@ const LawyerForm = () => {
       aadharProof: aadharProofFileRef.current,
       barCert: barCertFileRef.current,
     };
-    
+
     // Update Redux with latest latitude/longitude if they exist
     if (latitude) {
       dispatch(updateLawyer({ field: "latitude", value: latitude }));
@@ -716,7 +782,7 @@ const LawyerForm = () => {
     if (longitude) {
       dispatch(updateLawyer({ field: "longitude", value: longitude }));
     }
-    
+
     // Send to backend through Redux thunk
     const result = await dispatch(
       submitRegistration({ role: "Lawyer", data: formData })
@@ -728,7 +794,7 @@ const LawyerForm = () => {
         result.payload?.data?.message ||
         "Registration successful! Redirecting to login...";
       toast.success(successMessage);
-      
+
       setTimeout(() => {
         navigate("/login");
       }, 1500);
@@ -751,10 +817,17 @@ const LawyerForm = () => {
   };
 
   // Reusable component for file upload fields - PDF only
-  const FileUploadField = ({ label, id, field, disabled = false, errors, touched }) => {
+  const FileUploadField = ({
+    label,
+    id,
+    field,
+    disabled = false,
+    errors,
+    touched,
+  }) => {
     // Use ref to maintain file input state across re-renders
     const fileInputRef = useRef(null);
-    
+
     const handleFileInputChange = (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -766,17 +839,19 @@ const LawyerForm = () => {
           }
           return;
         }
-        
+
         // Validate file size (max 5MB)
         const maxSize = 5 * 1024 * 1024; // 5MB in bytes
         if (file.size > maxSize) {
-          toast.error("File size must be less than 5MB. Please select a smaller file.");
+          toast.error(
+            "File size must be less than 5MB. Please select a smaller file."
+          );
           if (fileInputRef.current) {
             fileInputRef.current.value = ""; // Clear the input
           }
           return;
         }
-        
+
         if (field) {
           handleFileChange(field, file);
           toast.success(`File selected: ${file.name}`);
@@ -792,18 +867,19 @@ const LawyerForm = () => {
         }
       }
     };
-    
+
     // Get filename from Redux for display
     const filename = lawyer[`${field}Filename`] || "";
     return (
-    <div className="flex flex-col">
-      <label htmlFor={id} className="text-sm font-medium text-gray-700 mb-1">
-          {label} <span className="text-red-500">*</span> <span className="text-xs text-gray-500">(PDF only, max 5MB)</span>
-      </label>
+      <div className="flex flex-col">
+        <label htmlFor={id} className="text-sm font-medium text-gray-700 mb-1">
+          {label} <span className="text-red-500">*</span>{" "}
+          <span className="text-xs text-gray-500">(PDF only, max 5MB)</span>
+        </label>
         <div className="relative">
-      <input
-        type="file"
-        id={id}
+          <input
+            type="file"
+            id={id}
             ref={fileInputRef}
             onChange={handleFileInputChange}
             disabled={disabled || isLoading}
@@ -814,13 +890,17 @@ const LawyerForm = () => {
           file:text-sm file:font-semibold
           file:bg-blue-50 file:text-blue-700
               hover:file:bg-blue-100 border border-gray-300 rounded-md shadow-sm ${
-                disabled || isLoading ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                disabled || isLoading
+                  ? "cursor-not-allowed opacity-60"
+                  : "cursor-pointer"
               }`}
           />
         </div>
         {filename ? (
           <div className="mt-1 flex items-center gap-1">
-            <span className="text-xs text-green-600 font-medium">✓ Selected:</span>
+            <span className="text-xs text-green-600 font-medium">
+              ✓ Selected:
+            </span>
             <span className="text-xs text-green-700">{filename}</span>
           </div>
         ) : (
@@ -828,25 +908,35 @@ const LawyerForm = () => {
             <span className="text-xs text-gray-400">No file chosen</span>
           </div>
         )}
-       {touched[field] && errors[`${field}Filename`] && (
-  <span className="text-red-500 text-sm mt-1">{errors[`${field}Filename`]}</span>
-)}
-    </div>
-  );
+        {touched[field] && errors[`${field}Filename`] && (
+          <span className="text-red-500 text-sm mt-1">
+            {errors[`${field}Filename`]}
+          </span>
+        )}
+      </div>
+    );
   };
 
   // Reusable component for select dropdowns
-  const SelectField = ({ label, id, options, value, onChange, onBlur, disabled = false }) => {
+  const SelectField = ({
+    label,
+    id,
+    options,
+    value,
+    onChange,
+    onBlur,
+    disabled = false,
+  }) => {
     const selectRef = useRef(null);
 
     const handleChange = (e) => {
       // Save scroll position before change
       scrollPositionRef.current = window.scrollY;
-      
+
       if (onChange) {
         onChange(e.target.value);
       }
-      
+
       // Restore scroll position after change
       setTimeout(() => {
         window.scrollTo({
@@ -861,52 +951,55 @@ const LawyerForm = () => {
     };
 
     return (
-    <div className="flex flex-col">
-      <label htmlFor={id} className="text-sm font-medium text-gray-700 mb-1">
-        {label}
-      </label>
-      <div className="relative">
-        <select
+      <div className="flex flex-col">
+        <label htmlFor={id} className="text-sm font-medium text-gray-700 mb-1">
+          {label}
+        </label>
+        <div className="relative">
+          <select
             ref={selectRef}
-          id={id}
+            id={id}
             value={value || ""}
             onChange={handleChange}
             onBlur={onBlur}
             disabled={disabled || isLoading}
             onFocus={(e) => {
               // Prevent scroll on focus
-              e.target.scrollIntoView({ behavior: "instant", block: "nearest" });
+              e.target.scrollIntoView({
+                behavior: "instant",
+                block: "nearest",
+              });
             }}
             className={`block w-full pl-3 pr-10 py-2.5 text-sm border-gray-300 focus:outline-none focus:ring-1 rounded-md shadow-sm border appearance-none ${
               disabled || isLoading
                 ? "bg-gray-100 cursor-not-allowed opacity-60"
                 : "cursor-pointer focus:ring-blue-500 focus:border-blue-500"
             }`}
-        >
-          <option value="">{`Select ${label.split(" ")[0]}`}</option>
+          >
+            <option value="">{`Select ${label.split(" ")[0]}`}</option>
             {options.map((option) => (
               <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-          <svg
-            className="h-5 w-5"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <svg
+              className="h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
   };
 
   const specializationOptions = [
@@ -975,15 +1068,15 @@ const LawyerForm = () => {
           required
         />
 
-        <FileUploadField 
-          label="Aadhar Proof" 
-          id="aadhar-proof" 
+        <FileUploadField
+          label="Aadhar Proof"
+          id="aadhar-proof"
           field="aadharProof"
           errors={errors}
           touched={touched}
         />
         <InputField
-          label="Bar Council ID"
+          label="Bar Council Enrollment Number"
           id="bar-council-id"
           placeholder="Bar Council ID"
           field="barId"
@@ -1017,10 +1110,10 @@ const LawyerForm = () => {
           )}
         </div>
         <div className="flex flex-col">
-        <SelectField
-          label="Specialization"
-          id="specialization"
-          options={specializationOptions}
+          <SelectField
+            label="Specialization"
+            id="specialization"
+            options={specializationOptions}
             value={selectedSpecialization || lawyer.specialization || ""}
             onChange={(value) => {
               setSelectedSpecialization(value);
@@ -1033,7 +1126,9 @@ const LawyerForm = () => {
             onBlur={() => handleBlur("specialization")}
           />
           {touched.specialization && errors.specialization && (
-            <span className="text-red-500 text-sm mt-1">{errors.specialization}</span>
+            <span className="text-red-500 text-sm mt-1">
+              {errors.specialization}
+            </span>
           )}
         </div>
 
@@ -1062,7 +1157,10 @@ const LawyerForm = () => {
         {/* Address Field with Geocode Button */}
         <div className="md:col-span-2">
           <div className="flex items-center justify-between mb-1">
-            <label htmlFor="address" className="text-sm font-medium text-gray-700">
+            <label
+              htmlFor="address"
+              className="text-sm font-medium text-gray-700"
+            >
               Address <span className="text-red-500">*</span>
             </label>
             {/* <button
@@ -1136,10 +1234,14 @@ const LawyerForm = () => {
             }`}
           />
           {touched.address && errors.address && (
-            <span className="text-red-500 text-sm mt-1 block">{errors.address}</span>
+            <span className="text-red-500 text-sm mt-1 block">
+              {errors.address}
+            </span>
           )}
           {geocodingError && (
-            <span className="text-red-500 text-xs mt-1 block">{geocodingError}</span>
+            <span className="text-red-500 text-xs mt-1 block">
+              {geocodingError}
+            </span>
           )}
         </div>
         <div className="flex flex-col">
@@ -1206,9 +1308,7 @@ const LawyerForm = () => {
         {/* Latitude and Longitude Section */}
         <div className="md:col-span-2">
           <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-medium text-gray-700">
-             
-            </label>
+            <label className="text-sm font-medium text-gray-700"></label>
             <button
               type="button"
               onClick={handleGetCurrentLocation}
@@ -1273,7 +1373,9 @@ const LawyerForm = () => {
           )}
           {!locationError && !isGettingLocation && (
             <div className="mb-2 p-2 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded">
-              💡 Tip: Make sure location/GPS is enabled on your device. If it times out, try using the "Get Coordinates from Address" button below or enter coordinates manually.
+              💡 Tip: Make sure location/GPS is enabled on your device. If it
+              times out, try using the "Get Coordinates from Address" button
+              below or enter coordinates manually.
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1315,7 +1417,9 @@ const LawyerForm = () => {
                 }`}
               />
               {touched.latitude && errors.latitude && (
-                <span className="text-red-500 text-sm mt-1">{errors.latitude}</span>
+                <span className="text-red-500 text-sm mt-1">
+                  {errors.latitude}
+                </span>
               )}
             </div>
             <div className="flex flex-col">
@@ -1356,58 +1460,63 @@ const LawyerForm = () => {
                 }`}
               />
               {touched.longitude && errors.longitude && (
-                <span className="text-red-500 text-sm mt-1">{errors.longitude}</span>
+                <span className="text-red-500 text-sm mt-1">
+                  {errors.longitude}
+                </span>
               )}
             </div>
           </div>
-          
+
           {/* Google Maps Preview */}
-          {latitude && longitude && isLatitudeValid(latitude) && isLongitudeValid(longitude) && (
-            <div className="mt-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Location Preview
-                </label>
-                <a
-                  href={`https://www.google.com/maps?q=${latitude},${longitude}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                >
-                  <span>Open in Google Maps</span>
-                  <svg
-                    className="h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+          {latitude &&
+            longitude &&
+            isLatitudeValid(latitude) &&
+            isLongitudeValid(longitude) && (
+              <div className="mt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Location Preview
+                  </label>
+                  <a
+                    href={`https://www.google.com/maps?q=${latitude},${longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
+                    <span>Open in Google Maps</span>
+                    <svg
+                      className="h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                  </a>
+                </div>
+                <div className="w-full h-64 border border-gray-300 rounded-md overflow-hidden bg-gray-100">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    allowFullScreen
+                    referrerPolicy="no-referrer-when-downgrade"
+                    src={`https://www.google.com/maps?q=${latitude},${longitude}&output=embed&z=15`}
+                    title="Location Preview"
+                  ></iframe>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Coordinates: {latitude}, {longitude}
+                </p>
               </div>
-              <div className="w-full h-64 border border-gray-300 rounded-md overflow-hidden bg-gray-100">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  allowFullScreen
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://www.google.com/maps?q=${latitude},${longitude}&output=embed&z=15`}
-                  title="Location Preview"
-                ></iframe>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Coordinates: {latitude}, {longitude}
-              </p>
-            </div>
-          )}
+            )}
         </div>
 
         <InputField

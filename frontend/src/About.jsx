@@ -1,10 +1,10 @@
 import React from "react";
-
+import Navbar from "./pages/NavBar";
 export default function About() {
   return (
     <section className="min-h-screen bg-gradient-to-b from-white to-blue-50 pt-28 px-6">
       <div className="max-w-5xl mx-auto">
-
+        <Navbar />
         {/* HEADER */}
         <h1 className="text-4xl font-extrabold text-center text-gray-900">
           About LegalAid Connect
@@ -28,18 +28,20 @@ export default function About() {
           <div className="p-8 bg-white shadow-xl rounded-xl">
             <h2 className="text-2xl font-bold text-blue-700">Our Vision</h2>
             <p className="text-gray-600 mt-3 leading-relaxed">
-              We envision a world where legal support is not a luxury but a right.
-              Through pro bono lawyers, NGOs, and verified legal professionals,
-              we aim to bridge the gap between those who need help and those who can offer it.
+              We envision a world where legal support is not a luxury but a
+              right. Through pro bono lawyers, NGOs, and verified legal
+              professionals, we aim to bridge the gap between those who need
+              help and those who can offer it.
             </p>
           </div>
 
           <div className="p-8 bg-white shadow-xl rounded-xl">
             <h2 className="text-2xl font-bold text-green-700">Why We Exist</h2>
             <p className="text-gray-600 mt-3 leading-relaxed">
-              Millions remain unheard because they lack legal awareness or cannot
-              afford representation. We created this platform to empower citizens,
-              support communities, and unite legal helpers for a stronger society.
+              Millions remain unheard because they lack legal awareness or
+              cannot afford representation. We created this platform to empower
+              citizens, support communities, and unite legal helpers for a
+              stronger society.
             </p>
           </div>
         </div>

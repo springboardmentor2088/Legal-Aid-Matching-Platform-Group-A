@@ -1,4 +1,5 @@
 import React from "react";
+import Navbar from "./pages/NavBar";
 import { Link } from "react-router-dom";
 
 export default function Services() {
@@ -6,6 +7,7 @@ export default function Services() {
     <section className="min-h-screen bg-gradient-to-b from-white to-blue-50 pt-28 px-6">
       <div className="max-w-6xl mx-auto">
         {/* HEADER */}
+        <Navbar />
         <h1 className="text-4xl font-extrabold text-center text-gray-900">
           Our Services
         </h1>
