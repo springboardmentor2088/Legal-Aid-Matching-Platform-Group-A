@@ -23,7 +23,7 @@ export default function CitizenDashboard() {
   useEffect(() => {
     const checkWidth = () => {
       const width = window.innerWidth;
-      setIsMobile(width <= 500);
+      setIsMobile(width <= 700);
       // On mobile, close sidebar by default
       if (width <= 500) {
         setIsSidebarOpen(false);
@@ -183,7 +183,7 @@ export default function CitizenDashboard() {
           {isMobile && (
             <button
               onClick={toggleSidebar}
-              className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 mr-2"
+              className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 mr-2 cursor-pointer"
               aria-label="Toggle sidebar"
             >
               <svg

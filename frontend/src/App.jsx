@@ -9,9 +9,9 @@ import About from "./About.jsx";
 import Contact from "./Contact.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import CitizenDashboard from "./components/Dashboard/CitizenDashboard.jsx";
-import LawyerDashboard from "./components/Dashboard/LawyerDashboard.jsx";
+import LawyerDashboard from "./components/lawyerDashboard/LawyerDashboard.jsx";
 import NGODashboard from "./components/Dashboard/NGODashboard.jsx";
-import AdminDashboard from "./components/Dashboard/AdminDashboard.jsx";
+import AdminDashboard from "./components/adminDashbaord/AdminDashboard.jsx";
 import { getProfile } from "./api/auth.js";
 import MapComponent from "./pages/MapComponent.jsx";
 import ForgotPassword from "./components/Auth/ForgotPassword.jsx"; //New added

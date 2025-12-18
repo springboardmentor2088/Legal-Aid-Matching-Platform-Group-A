@@ -47,7 +47,7 @@ export default function LawyerDashboard() {
           <span className="font-medium text-gray-700">Lawyer</span>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg cursor-pointer"
           >
             Logout
           </button>
@@ -112,7 +112,7 @@ export default function LawyerDashboard() {
 
             <button
               onClick={() => setCaseAccepted(true)}
-              className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+              className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition cursor-pointer"
             >
               Accept Case
             </button>

@@ -8,6 +8,7 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateLawyer, submitRegistration } from "../../Redux/registerSlice";
+import { API_BASE } from "../../api/axiosClient.js";
 import { toast } from "react-toastify";
 import {
   INDIAN_STATES_AND_UT_ARRAY,
@@ -304,17 +305,17 @@ const LawyerForm = () => {
   };
 
   const validateBarCouncilId = (barId) => {
-    if (!value) {
+    if (!barId) {
       return "Enrollment number is required.";
     }
 
     const enrollmentRegex = /^[A-Z]{2,3}\/\d{1,5}\/(19|20)\d{2}$/;
 
-    if (!enrollmentRegex.test(value)) {
+    if (!enrollmentRegex.test(barId)) {
       return "Invalid enrollment number format. Example: MAH/1234/2012";
     }
 
-    const year = parseInt(value.split("/")[2], 10);
+    const year = parseInt(barId.split("/")[2], 10);
     const currentYear = new Date().getFullYear();
 
     if (year > currentYear) {
@@ -578,7 +579,7 @@ const LawyerForm = () => {
     try {
       // Using backend endpoint to avoid CORS issues
       const response = await fetch(
-        `http://localhost:8080/api/geocoding/geocode?address=${encodeURIComponent(
+        `${API_BASE}/geocoding/geocode?address=${encodeURIComponent(
           fullAddress
         )}`,
         {

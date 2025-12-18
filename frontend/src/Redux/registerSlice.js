@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosClient from "../api/axiosClient.js";
 
 // ---------------------------------------------
 // 1. SEND DATA TO BACKEND  
@@ -25,10 +25,9 @@ export const submitRegistration = createAsyncThunk(
                     password: data.password,
                 };
 
-                const response = await axios.post(
-                    "http://localhost:8080/citizens/add",
-                    payload,
-                    { headers: { "Content-Type": "application/json" } }
+                const response = await axiosClient.post(
+                    "/citizens/add",
+                    payload
                 );
 
                 return response.data;
@@ -93,14 +92,14 @@ export const submitRegistration = createAsyncThunk(
             // Fix endpoint URL - use correct path for each role
             let endpoint;
             if (role === "Lawyer") {
-                endpoint = "http://localhost:8080/lawyers/add";
+                endpoint = "/lawyers/add";
             } else if (role === "NGO") {
-                endpoint = "http://localhost:8080/ngos/add";
+                endpoint = "/ngos/add";
             } else {
-                endpoint = "http://localhost:8080/" + role.toLowerCase() + "/add";
+                endpoint = "/" + role.toLowerCase() + "/add";
             }
 
-            const response = await axios.post(
+            const response = await axiosClient.post(
                 endpoint,
                 formData,
                 { headers: { "Content-Type": "multipart/form-data" } }
@@ -122,7 +121,7 @@ export const fetchRegistrations = createAsyncThunk(
     "register/fetchRegistrations",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get("http://localhost:8080/api/users");
+            const response = await axiosClient.get("/users");
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data || "Unable to fetch users");

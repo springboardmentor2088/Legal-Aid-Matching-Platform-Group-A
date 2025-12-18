@@ -41,7 +41,7 @@ export default function NGODashboard() {
             <h1 className="text-sm text-gray-500">Legal Aid Platform</h1>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg"
+              className="px-4 py-2 bg-red-600 text-white rounded-lg cursor-pointer"
             >
               Logout
             </button>
@@ -55,7 +55,7 @@ export default function NGODashboard() {
           <span className="font-medium text-gray-700">NGO</span>
           <button 
             onClick={handleLogout}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 cursor-pointer"
           >
             Logout
           </button>
@@ -118,7 +118,7 @@ export default function NGODashboard() {
 
             <button
               onClick={() => setCaseAccepted(true)}
-              className="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition"
+              className="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition cursor-pointer"
             >
               Accept Case
             </button>
@@ -153,7 +153,7 @@ export default function NGODashboard() {
               {/* Toggle Chat Box Button */}
               <button
                 onClick={() => setShowChat(!showChat)}
-                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition"
+                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition cursor-pointer"
               >
                 {showChat ? "Minimize Chat" : "Open Chat"}
               </button>
@@ -182,7 +182,7 @@ export default function NGODashboard() {
                     placeholder="Type your message..."
                     className="flex-1 p-3 rounded-lg border"
                   />
-                  <button className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                  <button className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer">
                     Send
                   </button>
                 </div>

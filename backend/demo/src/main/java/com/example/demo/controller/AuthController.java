@@ -3,9 +3,11 @@ package com.example.demo.controller;
 import com.example.demo.entity.Citizen;
 import com.example.demo.entity.Lawyer;
 import com.example.demo.entity.NGO;
+import com.example.demo.entity.Admin;
 import com.example.demo.repository.CitizenRepository;
 import com.example.demo.repository.LawyerRepository;
 import com.example.demo.repository.NGORepository;
+import com.example.demo.repository.AdminRepository;
 import com.example.demo.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +24,19 @@ public class AuthController {
     private final CitizenRepository citizenRepo;
     private final LawyerRepository lawyerRepo;
     private final NGORepository ngoRepo;
+    private final AdminRepository adminRepo;
     private final JwtUtil jwtUtil;
 
     public AuthController(
             CitizenRepository citizenRepo,
             LawyerRepository lawyerRepo,
             NGORepository ngoRepo,
+            AdminRepository adminRepo,
             JwtUtil jwtUtil) {
         this.citizenRepo = citizenRepo;
         this.lawyerRepo = lawyerRepo;
         this.ngoRepo = ngoRepo;
+        this.adminRepo = adminRepo;
         this.jwtUtil = jwtUtil;
     }
 
@@ -106,15 +111,20 @@ public class AuthController {
                     break;
 
                 case "ADMIN":
-                    // For now, hardcode admin credentials (you can create an Admin entity later)
-                    if (!email.equals("admin@advocare.com") || !password.equals("admin123")) {
+                    Admin admin = adminRepo.findByEmail(email);
+                    if (admin == null) {
                         return ResponseEntity
                                 .status(HttpStatus.UNAUTHORIZED)
                                 .body("Invalid email or password");
                     }
-                    username = "Admin";
-                    userId = 0;
-                    role = "ADMIN";
+                    if (!admin.getPassword().equals(password)) {
+                        return ResponseEntity
+                                .status(HttpStatus.UNAUTHORIZED)
+                                .body("Invalid email or password");
+                    }
+                    user = admin;
+                    username = admin.getFullName();
+                    userId = admin.getId();
                     break;
 
                 default:
@@ -158,9 +168,9 @@ public class AuthController {
                     }
                     break;
                 case "ADMIN":
-                    // Admin has minimal data
-                    userData.put("email", email);
-                    userData.put("username", username);
+                    if (user != null) {
+                        userData = buildAdminData((Admin) user);
+                    }
                     break;
             }
             response.put("userData", userData);
@@ -241,6 +251,25 @@ public class AuthController {
         data.put("latitude", ngo.getLatitude());
         data.put("longitude", ngo.getLongitude());
         data.put("createdAt", ngo.getCreatedAt() != null ? ngo.getCreatedAt().toString() : null);
+        return data;
+    }
+
+    // Helper method to build Admin data (excluding password)
+    private Map<String, Object> buildAdminData(Admin admin) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", admin.getId());
+        data.put("fullName", admin.getFullName());
+        data.put("aadharNum", admin.getAadharNum());
+        data.put("email", admin.getEmail());
+        data.put("mobileNum", admin.getMobileNum());
+        data.put("dateOfBirth", admin.getDateOfBirth() != null ? admin.getDateOfBirth().toString() : null);
+        data.put("state", admin.getState());
+        data.put("district", admin.getDistrict());
+        data.put("city", admin.getCity());
+        data.put("address", admin.getAddress());
+        data.put("profilePhotoUrl", admin.getProfilePhotoUrl());
+        data.put("createdAt", admin.getCreatedAt() != null ? admin.getCreatedAt().toString() : null);
+        data.put("updatedAt", admin.getUpdatedAt() != null ? admin.getUpdatedAt().toString() : null);
         return data;
     }
 }

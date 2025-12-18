@@ -6,9 +6,9 @@ import Home from "./pages/Home.js";
 import Profile from "./pages/Profile.js";
 import ProtectedRoute from "./components/ProtectedRoute.js";
 import CitizenDashboard from "./components/Dashboard/CitizenDashboard.js";
-import LawyerDashboard from "./components/Dashboard/LawyerDashboard.js";
+import LawyerDashboard from "./components/lawyerDashboard/LawyerDashboard.js";
 import NGODashboard from "./components/Dashboard/NGODashboard.js";
-import AdminDashboard from "./components/Dashboard/AdminDashboard.js";
+import AdminDashboard from "./components/adminDashbaord/AdminDashboard.js";
 import { getProfile } from "./api/auth.js";
 
 export default function App() {

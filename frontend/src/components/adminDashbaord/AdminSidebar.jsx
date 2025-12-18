@@ -2,9 +2,9 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser, fetchUserProfile } from "../../Redux/authSlice.js";
-import appLogo from "../../assets/LOGO.png"; // adjust path if needed
+import appLogo from "../../assets/LOGO.png";
 
-export default function CitizenSidebar({
+export default function AdminSidebar({
   profile: propProfile,
   activePage,
   setActivePage,
@@ -79,13 +79,13 @@ export default function CitizenSidebar({
             ? "translate-x-0"
             : "-translate-x-full"
           : "translate-x-0"
-      } bg-teal-900 text-white flex flex-col p-6`}
+      } bg-[#4B227A] text-white flex flex-col p-6`}
     >
       {/* Close Button for Mobile */}
       {isMobile && (
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-md hover:bg-teal-800 text-white cursor-pointer"
+          className="absolute top-4 right-4 p-2 rounded-md hover:bg-[#3a1a5f] text-white cursor-pointer"
           aria-label="Close sidebar"
         >
           <svg
@@ -103,15 +103,15 @@ export default function CitizenSidebar({
           </svg>
         </button>
       )}
-      <div className="flex items-center gap-3 pb-4 border-b border-teal-700">
+
+      <div className="flex items-center gap-3 pb-4 border-b border-white/20">
         <div className="w-12 h-12 bg-white/10 rounded-md flex items-center justify-center">
           <img
-            src={appLogo} // or "../assets/LOGO.png" based on your setup
+            src={appLogo}
             alt="AdvoCare Logo"
             className="w-8 h-8 object-contain"
           />
         </div>
-
         <div>
           <div className="text-sm opacity-90">AdvoCare</div>
           <div className="text-xs opacity-80">Legal Aid Platform</div>
@@ -119,44 +119,44 @@ export default function CitizenSidebar({
       </div>
 
       <div className="mt-6 mb-6 flex items-center gap-3">
-        <div className="w-10 h-10 bg-teal-700 rounded-full flex items-center justify-center font-semibold overflow-hidden border-2 border-teal-600">
-          {profile.photoUrl ? (
+        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-semibold overflow-hidden border-2 border-white/30">
+          {profile?.photoUrl ? (
             <img
               src={profile.photoUrl}
-              alt={profile.shortName || "User"}
+              alt={profile.fullName || "Admin"}
               className="w-full h-full object-cover"
             />
           ) : (
             <span>
-              {profile.shortName?.charAt(0) ||
-                profile.fullName?.charAt(0) ||
-                "S"}
+              {profile?.fullName?.charAt(0) || profile?.shortName?.charAt(0) || "A"}
             </span>
           )}
         </div>
         <div>
           <div className="font-semibold">
-            {profile.shortName || profile.fullName || "User"}
+            {profile?.fullName || profile?.shortName || "Admin User"}
           </div>
-          <div className="text-xs opacity-80">Citizen</div>
+          <div className="text-xs opacity-80">Administrator</div>
         </div>
       </div>
 
       <nav className="flex-1">
         {[
           { key: "overview", label: "Overview" },
-          { key: "addcase", label: "Add Your Case" },
-          { key: "cases", label: "My Cases" },
-          { key: "find", label: "Find Lawyer & NGOs" },
-          { key: "messages", label: "Messages" },
+          { key: "verifications", label: "User Verifications" },
+          { key: "cases", label: "Cases" },
+          { key: "lawyers", label: "Lawyers" },
+          { key: "ngos", label: "NGOs" },
           { key: "profile", label: "Profile" },
           { key: "settings", label: "Settings" },
         ].map((item) => (
           <button
             key={item.key}
             onClick={() => handleNavClick(item.key)}
-            className={`w-full text-left px-3 py-3 rounded-md mb-2 transition-colors cursor-pointer ${
-              activePage === item.key ? "bg-teal-800" : "hover:bg-teal-800/60"
+            className={`w-full text-left px-3 py-3 rounded-md mb-2 transition-colors ${
+              activePage === item.key
+                ? "bg-[#FDB415] text-[#4B227A] font-semibold"
+                : "hover:bg-white/10"
             }`}
           >
             {item.label}
@@ -164,7 +164,7 @@ export default function CitizenSidebar({
         ))}
       </nav>
 
-      <div className="pt-4 border-t border-teal-700">
+      <div className="pt-4 border-t border-white/20">
         <button
           onClick={handleLogout}
           className="w-full bg-red-500 hover:bg-red-600 px-3 py-2 rounded-md text-white cursor-pointer"

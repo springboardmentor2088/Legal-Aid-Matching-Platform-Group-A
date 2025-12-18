@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/ngos")
+@RequestMapping("/api/ngos")
 public class NGOController {
 
     private final NGORepository repo;

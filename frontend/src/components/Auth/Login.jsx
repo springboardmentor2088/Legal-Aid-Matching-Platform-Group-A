@@ -121,7 +121,7 @@ export default function Login() {
             state: { success: "Login successful! Welcome NGO Member." },
           });
         } else if (userRole === "ADMIN") {
-          navigate("/admin/dashboard", {
+          navigate("/dashboard/admin", {
             state: { success: "Login successful! Welcome Admin." },
           });
         } else {

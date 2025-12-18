@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/lawyers")
+@RequestMapping("/api/lawyers")
 public class LawyerController {
 
     private final LawyerRepository repo;
