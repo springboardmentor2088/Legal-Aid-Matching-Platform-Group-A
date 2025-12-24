@@ -20,7 +20,9 @@ public class SecurityConfig {
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()   // login/register
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/profile/**").permitAll()   // TEMP: open profile APIs
+                        .requestMatchers("/api/cases/**").permitAll()     // TEMP: open case APIs
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form.disable())
@@ -28,5 +30,9 @@ public class SecurityConfig {
 
         return http.build();
     }
+<<<<<<< Updated upstream
 }
 
+=======
+}   // <--- this closing brace for the class is required
+>>>>>>> Stashed changes
