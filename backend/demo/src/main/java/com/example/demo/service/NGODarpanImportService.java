@@ -2,46 +2,82 @@ package com.example.demo.service;
 
 import com.example.demo.entity.DirectoryEntry;
 import com.example.demo.repository.DirectoryEntryRepository;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class NGODarpanImportService {
 
-    private final DirectoryEntryRepository repository;
+    private final DirectoryEntryRepository directoryEntryRepository;
 
-    public NGODarpanImportService(DirectoryEntryRepository repository) {
-        this.repository = repository;
+    public NGODarpanImportService(DirectoryEntryRepository directoryEntryRepository) {
+        this.directoryEntryRepository = directoryEntryRepository;
     }
 
-    public void importCSV(String fileName) {
+    /**
+     * Import NGOs from a CSV file on the classpath.
+     * Expected header:
+     * registrationNumber,name,state,district,specialization,contactPhone
+     */
+    public void importCSV(String filename) {
+        try {
+            ClassPathResource resource = new ClassPathResource(filename);
 
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(
-                        getClass().getClassLoader().getResourceAsStream(fileName)))) {
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
 
-            String line;
-            br.readLine(); // skip header
+                String line;
+                boolean first = true;
 
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
+                while ((line = reader.readLine()) != null) {
+                    // skip header
+                    if (first) {
+                        first = false;
+                        continue;
+                    }
 
-                DirectoryEntry d = new DirectoryEntry();
-                d.setName(data[0]);
-                d.setType("NGO");
-                d.setState(data[1]);
-                d.setDistrict(data[2]);
-                d.setSpecialization(data[3]);
-                d.setContactPhone(data[4]);
-                d.setSource("NGO_DARPAN");
+                    if (line.isBlank()) {
+                        continue;
+                    }
 
-                repository.save(d);
+                    String[] parts = line.split(",", -1); // keep empty columns
+
+                    // Guard if the row is shorter than expected
+                    if (parts.length < 6) {
+                        continue;
+                    }
+
+                    String registrationNumber = parts[0].trim();
+                    String name = parts[1].trim();
+                    String state = parts[2].trim();
+                    String district = parts[3].trim();
+                    String specialization = parts[4].trim();
+                    String contactPhone = parts[5].trim();
+
+                    DirectoryEntry entry = new DirectoryEntry();
+                    entry.setType("NGO");
+                    entry.setSource("NGO_DARPAN");
+                    entry.setRegistrationNumber(registrationNumber);
+                    entry.setName(name);
+                    entry.setState(state);
+                    entry.setDistrict(district);
+                    entry.setSpecialization(specialization);
+                    entry.setContactPhone(contactPhone);
+
+                    // Imported entries are verified but still need admin approval to show in
+                    // citizen search
+                    entry.setVerified(true);
+                    entry.setApproved(false);
+
+                    directoryEntryRepository.save(entry);
+                }
             }
-
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to import NGO Darpan CSV", e);
         }
     }
 }

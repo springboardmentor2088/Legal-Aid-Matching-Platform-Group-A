@@ -1,7 +1,7 @@
 package com.example.demo.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.demo.entity.Lawyer;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
@@ -13,7 +13,10 @@ public interface LawyerRepository extends JpaRepository<Lawyer, Integer> {
     boolean existsByBarCouncilId(String barCouncilId);
     Lawyer findByEmail(String email);
 
-    // ✅ ADD THESE FOR DIRECTORY SEARCH (TASK-2)
+    // for verification-based filtering
+    List<Lawyer> findByVerificationStatusTrue();
+
+    // ✅ existing for directory search
     List<Lawyer> findByCity(String city);
 
     List<Lawyer> findBySpecialization(String specialization);

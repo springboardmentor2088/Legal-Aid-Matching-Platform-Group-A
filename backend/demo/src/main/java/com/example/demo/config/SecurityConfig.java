@@ -14,25 +14,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/profile/**").permitAll()   // TEMP: open profile APIs
-                        .requestMatchers("/api/cases/**").permitAll()     // TEMP: open case APIs
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()   // allow everything for milestone demo
                 )
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable());
 
         return http.build();
     }
-<<<<<<< Updated upstream
 }
-
-=======
-}   // <--- this closing brace for the class is required
->>>>>>> Stashed changes
