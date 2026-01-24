@@ -16,7 +16,7 @@ export default function AdminSidebar({
   const dispatch = useDispatch();
 
   const { profile: reduxProfile, isAuthenticated } = useSelector(
-    (state) => state.auth
+    (state) => state.auth,
   );
 
   useEffect(() => {

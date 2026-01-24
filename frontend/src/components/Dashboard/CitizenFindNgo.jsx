@@ -1,4 +1,6 @@
 import React from "react";
+import { createSession } from "../../api/chatApi";
+import { toast } from "sonner";
 
 function NgoCard({ ngo, setActivePage, setSelectedRecipient }) {
   return (
@@ -24,13 +26,26 @@ function NgoCard({ ngo, setActivePage, setSelectedRecipient }) {
         )}
 
         <button
-          onClick={() => {
-            setActivePage("messages");
-            setSelectedRecipient({
-              type: "ngo",
-              id: ngo.id,
-              name: ngo.ngoName,
-            });
+          onClick={async () => {
+            try {
+              const res = await createSession(null, ngo.id, "NGO");
+              const session = res.data;
+              if (session && session.id) {
+                setSelectedRecipient({
+                  type: "ngo",
+                  id: ngo.id,
+                  name: ngo.ngoName,
+                  sessionId: session.id
+                });
+                setActivePage("messages");
+              } else {
+                toast.error("Failed to create chat session.");
+              }
+            } catch (err) {
+              console.error("Failed to start chat:", err);
+              const errorMsg = err.response?.data?.message || err.message || "Failed to start conversation.";
+              toast.error(errorMsg);
+            }
           }}
           className="bg-teal-700 dark:bg-teal-600 hover:bg-teal-800 dark:hover:bg-teal-700 text-white px-3 py-1 rounded mt-2 transition-colors"
         >

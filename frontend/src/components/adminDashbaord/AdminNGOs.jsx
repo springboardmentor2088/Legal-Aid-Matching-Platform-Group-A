@@ -59,7 +59,7 @@ export default function AdminNGOs() {
     (n) =>
       n.ngoName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       n.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      n.ngoType.toLowerCase().includes(searchTerm.toLowerCase())
+      n.ngoType.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (

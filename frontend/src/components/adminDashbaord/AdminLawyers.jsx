@@ -58,7 +58,7 @@ export default function AdminLawyers() {
     (l) =>
       l.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       l.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      l.specialization.toLowerCase().includes(searchTerm.toLowerCase())
+      l.specialization.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -163,6 +163,31 @@ export default function AdminLawyers() {
                         </button>
                       </div>
                     )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setSelectedLawyer(lawyer)}
+                      className="text-[9px] font-black uppercase tracking-widest text-[#D4AF37] hover:bg-[#D4AF37]/10 px-3 py-1.5 rounded-lg transition-all"
+                    >
+                      Details
+                    </button>
+                    {!lawyer.isApproved &&
+                      lawyer.adminStatus !== "REJECTED" && (
+                        <div className="flex flex-col gap-2">
+                          <button
+                            onClick={() => handleApprove(lawyer.id)}
+                            className="text-[9px] font-black uppercase tracking-widest bg-[#D4AF37] text-black px-4 py-1.5 rounded-lg hover:bg-[#c5a059] transition-all shadow-xl shadow-[#D4AF37]/10 w-full"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleReject(lawyer.id)}
+                            className="text-[9px] font-black uppercase tracking-widest bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-1.5 rounded-lg hover:bg-red-500 hover:text-white transition-all w-full"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>

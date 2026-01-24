@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
+import { createSession } from "../../api/chatApi";
+import { toast } from "sonner";
+
 function DirectoryCard({ item, setActivePage, setSelectedRecipient, onViewProfile, onBookAppointment, appointments = [] }) {
   // item is a DirectoryEntry
   const isLawyer = item.type === "LAWYER";
   const typeLabel = isLawyer ? "LAWYER" : "NGO";
   const name = item.name;
-  const specialization = isLawyer ? item.specialization : item.specialization || "Social Service";
+  const specialization = isLawyer
+    ? item.specialization
+    : item.specialization || "Social Service";
   // Note: DirectoryEntry reuses 'specialization' field. For NGO it might be mapped from 'ngoType' in import service.
   // Actually, checking entity, 'specialization' is the field for both.
 
@@ -58,13 +63,26 @@ function DirectoryCard({ item, setActivePage, setSelectedRecipient, onViewProfil
 
       <div className="grid grid-cols-1 gap-2 mt-2">
         <button
-          onClick={() => {
-            setActivePage("messages");
-            setSelectedRecipient({
-              type: isLawyer ? "lawyer" : "ngo",
-              id: item.id,
-              name: name,
-            });
+          onClick={async () => {
+            try {
+              const res = await createSession(null, item.id, isLawyer ? "LAWYER" : "NGO");
+              const session = res.data;
+              if (session && session.id) {
+                setSelectedRecipient({
+                  type: isLawyer ? "lawyer" : "ngo",
+                  id: item.id,
+                  name: name,
+                  sessionId: session.id
+                });
+                setActivePage("messages");
+              } else {
+                toast.error("Failed to create chat session.");
+              }
+            } catch (err) {
+              console.error("Failed to start chat:", err);
+              const errorMsg = err.response?.data?.message || err.message || "Failed to start conversation. Please try again.";
+              toast.error(errorMsg);
+            }
           }}
           className="w-full bg-[#234f4a] hover:bg-[#1a3b37] dark:bg-[#234f4a] dark:hover:bg-[#1a3b37] text-white py-2 rounded-lg text-sm font-medium transition-colors"
         >
@@ -128,7 +146,7 @@ export default function CitizenFindLawyer({
     try {
       const params = {
         page: page,
-        size: size
+        size: size,
       };
 
       if (filterType !== "All") params.type = filterType.toUpperCase();
@@ -137,16 +155,19 @@ export default function CitizenFindLawyer({
       if (filterNgoSpec) params.ngoSpecialization = filterNgoSpec;
       // Location search: Backend supports state, district separate params.
       // Front end has one input. If user types "Mumbai", we can try sending it as district or state?
-      // DirectoryController has state, district. 
+      // DirectoryController has state, district.
       // For now, let's treat location input as 'district' primarily or 'state' if fallback?
       // Actually backend controller search param is: name, state, district, specialization.
-      // If user uses single input for location, we might have to pick one. 
+      // If user uses single input for location, we might have to pick one.
       // Let's assume user types district for now.
       if (filterLocation) params.district = filterLocation;
       if (filterExperience) params.minExperience = parseInt(filterExperience);
 
       console.log("DEBUG: Fetching directory with params:", params);
-      const res = await axios.get("http://localhost:8080/api/directory/search", { params });
+      const res = await axios.get(
+        "https://advocare-backend-gkg0.onrender.com/api/directory/search",
+        { params },
+      );
       console.log("DEBUG: Search results received:", res.data.totalElements);
       setItems(res.data.content);
       setTotalPages(res.data.totalPages);
@@ -158,7 +179,7 @@ export default function CitizenFindLawyer({
     }
   }, [page, size, filterType, searchTerm, filterSpec, filterNgoSpec, filterLocation, filterExperience]);
 
-  // Fetch when dependencies change. 
+  // Fetch when dependencies change.
   // Debounce search term to avoid too many calls? For now plain effect.
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -332,7 +353,6 @@ export default function CitizenFindLawyer({
           </button>
         </div>
       )}
-
     </div>
   );
 }
